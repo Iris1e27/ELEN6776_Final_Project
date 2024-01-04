@@ -1,11 +1,33 @@
 import socket
+import sys
 import threading
 import sqlite3
 import hashlib
 import struct
 import json
+import logging
+import functools
+
+# 配置日志
+logging.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+def log_decorator(func):
+    """日志装饰器"""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            logging.info(f"Function {func.__name__} started with args: {args} and kwargs: {kwargs}")
+            result = func(*args, **kwargs)
+            logging.info(f"Function {func.__name__} ended successfully")
+            return result
+        except Exception as e:
+            logging.exception(f"Function {func.__name__} raised an exception: {e}")
+            # 可以选择在这里重新抛出异常，或者返回某种错误表示
+            raise 
+    return wrapper
 
 # database
+@log_decorator
 def create_connection(db_file):
     """ 创建一个数据库连接到SQLite数据库 """
     conn = None
@@ -16,6 +38,7 @@ def create_connection(db_file):
         print(e)
     return conn
 
+@log_decorator
 def create_tables(conn):
     """ 创建超级节点、对等节点和在线对等节点表 """
     sql_create_supernodes_table = """
@@ -48,7 +71,7 @@ def create_tables(conn):
     except sqlite3.Error as e:
         print(e)
 
-
+@log_decorator
 def add_supernode(conn, ip, port):
     """ 添加超级节点 """
     sql = ''' INSERT INTO supernodes(ip, port) VALUES(?,?) ON CONFLICT(ip) DO NOTHING '''
@@ -56,6 +79,7 @@ def add_supernode(conn, ip, port):
     cur.execute(sql, (ip, port))
     conn.commit()
 
+@log_decorator
 def delete_supernode(conn, ip):
     """ 删除超级节点 """
     sql = ''' DELETE FROM supernodes WHERE ip = ? '''
@@ -63,6 +87,7 @@ def delete_supernode(conn, ip):
     cur.execute(sql, (ip,))
     conn.commit()
 
+@log_decorator
 def add_peernode(conn, ip, port):
     """ 添加对等节点 """
     sql = ''' INSERT INTO peernodes(ip, port) VALUES(?,?) ON CONFLICT(ip) DO NOTHING '''
@@ -70,6 +95,7 @@ def add_peernode(conn, ip, port):
     cur.execute(sql, (ip, port))
     conn.commit()
 
+@log_decorator
 def delete_peernode(conn, ip):
     """ 删除对等节点 """
     sql = ''' DELETE FROM peernodes WHERE ip = ? '''
@@ -77,6 +103,7 @@ def delete_peernode(conn, ip):
     cur.execute(sql, (ip,))
     conn.commit()
 
+@log_decorator
 def update_keepalive_peernodes(conn, username, ip, port):
     """ 更新对等节点的保活时间戳 """
     sql = ''' REPLACE INTO online_peernodes(username, ip, port, last_keepalive)
@@ -85,6 +112,7 @@ def update_keepalive_peernodes(conn, username, ip, port):
     cur.execute(sql, (username, ip, port))
     conn.commit()
 
+@log_decorator
 def remove_inactive_peernodes(conn, timeout_seconds=120):
     """ 删除超过特定时间未发送保活的对等节点 """
     sql = ''' DELETE FROM online_peernodes WHERE (strftime('%s', 'now') - strftime('%s', last_keepalive)) > ? '''
@@ -108,6 +136,7 @@ def parse_request(data):
         return None, None
     return type_field, data_field
 
+@log_decorator
 def handle_client_connection(client_socket, conn):
     request = client_socket.recv(1024)
     type_field, data_field = parse_request(request)
@@ -202,16 +231,27 @@ def start_tcp_server(address, port, conn):
 
 
 # main
-def main():
-    db_file = 'supernode.db'
-    conn = create_connection(db_file)
+def main(config_path):
+    # 加载配置文件
+    with open(config_path) as f:
+        config = json.load(f)
 
+    db_file = config['database_file']
+    port = config['port']
+
+    # 创建数据库连接
+    conn = create_connection(db_file)
     if conn is not None:
         create_tables(conn)
-        # 启动TCP服务器
-        start_tcp_server('0.0.0.0', 8888, conn)
+        # 启动 TCP 服务器
+        start_tcp_server('0.0.0.0', port, conn)
     else:
         print("Error! 无法创建数据库连接。")
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) < 2:
+        print("Usage: python main.py <config_path>")
+        sys.exit(1)
+    
+    config_path = sys.argv[1]
+    main(config_path)

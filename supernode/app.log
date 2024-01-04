@@ -1,0 +1,14 @@
+2024-01-04 11:53:59,334 - root - INFO - Function create_connection started with args: ('supernode.db',) and kwargs: {}
+2024-01-04 11:53:59,335 - root - INFO - Function create_connection ended successfully
+2024-01-04 15:01:57,002 - root - INFO - Function handle_client_connection started with args: (<socket.socket fd=408, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 9001), raddr=('127.0.0.1', 5865)>, <sqlite3.Connection object at 0x00000224C01D3E40>) and kwargs: {}
+2024-01-04 15:01:57,003 - root - INFO - Function handle_client_connection ended successfully
+2024-01-04 15:01:57,005 - root - INFO - Function handle_client_connection started with args: (<socket.socket fd=396, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 9001), raddr=('127.0.0.1', 5866)>, <sqlite3.Connection object at 0x00000224C01D3E40>) and kwargs: {}
+2024-01-04 15:01:57,005 - root - INFO - Function update_keepalive_peernodes started with args: (<sqlite3.Connection object at 0x00000224C01D3E40>, 'testuser', '127.0.0.1', 5866) and kwargs: {}
+2024-01-04 15:01:57,012 - root - INFO - Function update_keepalive_peernodes ended successfully
+2024-01-04 15:01:57,012 - root - INFO - Function remove_inactive_peernodes started with args: (<sqlite3.Connection object at 0x00000224C01D3E40>,) and kwargs: {'timeout_seconds': 120}
+2024-01-04 15:01:57,013 - root - INFO - Function remove_inactive_peernodes ended successfully
+2024-01-04 15:01:57,013 - root - INFO - Function handle_client_connection ended successfully
+2024-01-04 15:01:57,015 - root - INFO - Function handle_client_connection started with args: (<socket.socket fd=412, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 9001), raddr=('127.0.0.1', 5867)>, <sqlite3.Connection object at 0x00000224C01D3E40>) and kwargs: {}
+2024-01-04 15:01:57,015 - root - INFO - Function handle_client_connection ended successfully
+2024-01-04 15:01:57,015 - root - INFO - Function handle_client_connection started with args: (<socket.socket fd=396, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 9001), raddr=('127.0.0.1', 5868)>, <sqlite3.Connection object at 0x00000224C01D3E40>) and kwargs: {}
+2024-01-04 15:01:57,016 - root - INFO - Function handle_client_connection ended successfully

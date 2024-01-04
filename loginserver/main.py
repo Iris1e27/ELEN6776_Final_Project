@@ -1,11 +1,34 @@
 import socket
+import sys
 import threading
 import sqlite3
 import hashlib
 import struct
 import json
+import logging
+import functools
+
+# 配置日志
+logging.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+def log_decorator(func):
+    """日志装饰器"""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            logging.info(f"Function {func.__name__} started with args: {args} and kwargs: {kwargs}")
+            result = func(*args, **kwargs)
+            logging.info(f"Function {func.__name__} ended successfully")
+            return result
+        except Exception as e:
+            logging.exception(f"Function {func.__name__} raised an exception: {e}")
+            # 可以选择在这里重新抛出异常，或者返回某种错误表示
+            raise 
+    return wrapper
+
 
 # database
+@log_decorator
 def create_connection(db_file):
     """ 创建一个数据库连接到SQLite数据库 """
     conn = None
@@ -16,6 +39,7 @@ def create_connection(db_file):
         print(e)
     return conn
 
+@log_decorator
 def create_tables(conn):
     """ 创建表格 """
     create_users_table = """
@@ -26,8 +50,9 @@ def create_tables(conn):
     """
     create_supernodes_table = """
     CREATE TABLE IF NOT EXISTS supernodes (
-        ip text PRIMARY KEY,
-        port integer PRIMARY KEY
+        ip TEXT,
+        port INTEGER,
+        PRIMARY KEY (ip, port)
     );
     """
     try:
@@ -37,6 +62,7 @@ def create_tables(conn):
     except sqlite3.Error as e:
         print(e)
 
+@log_decorator
 def add_user(conn, username, password):
     """ 添加新用户 """
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
@@ -45,6 +71,7 @@ def add_user(conn, username, password):
     cur.execute(sql, (username, hashed_password))
     conn.commit()
     
+@log_decorator
 def delete_user(conn, username):
     """ 删除用户 """
     sql = ''' DELETE FROM users WHERE username = ? '''
@@ -52,12 +79,14 @@ def delete_user(conn, username):
     cur.execute(sql, (username,))
     conn.commit()
 
+@log_decorator
 def register_user(conn, username, hashed_password):
     sql = ''' INSERT INTO users(username, hashed_password) VALUES(?,?) ON CONFLICT(username) DO NOTHING '''
     cur = conn.cursor()
     cur.execute(sql, (username, hashed_password))
     conn.commit()
 
+@log_decorator
 def authenticate_user(conn, username, hashed_password):
     sql = 'SELECT hashed_password FROM users WHERE username = ?'
     cur = conn.cursor()
@@ -65,7 +94,7 @@ def authenticate_user(conn, username, hashed_password):
     result = cur.fetchone()
     return result and result[0] == hashed_password
 
-
+@log_decorator
 def add_supernode(conn, ip, port):
     """ 添加超级节点 """
     sql = ''' INSERT INTO supernodes(ip, port) VALUES(?,?) '''
@@ -73,6 +102,7 @@ def add_supernode(conn, ip, port):
     cur.execute(sql, (ip, port))
     conn.commit()
 
+@log_decorator
 def remove_supernode(conn, ip):
     """ 移除超级节点 """
     sql = 'DELETE FROM supernodes WHERE ip = ?'
@@ -80,6 +110,7 @@ def remove_supernode(conn, ip):
     cur.execute(sql, (ip,))
     conn.commit()
 
+@log_decorator
 def query_all_supernodes(conn):
     """ 查询所有超级节点 """
     sql = 'SELECT ip, port FROM supernodes'
@@ -104,6 +135,7 @@ def parse_request(data):
         return None, None
     return type_field, data_field
 
+@log_decorator
 def handle_client_connection(client_socket, conn):
     request = client_socket.recv(1024)
     type_field, data_field = parse_request(request)
@@ -206,16 +238,27 @@ def start_tcp_server(address, port, conn):
 
 
 # main
-def main():
-    db_file = 'loginserver.db'
-    conn = create_connection(db_file)
+def main(config_path):
+    # 加载配置文件
+    with open(config_path) as f:
+        config = json.load(f)
 
+    db_file = config['database_file']
+    port = config['port']
+
+    # 创建数据库连接
+    conn = create_connection(db_file)
     if conn is not None:
         create_tables(conn)
-        # 启动TCP服务器
-        start_tcp_server('0.0.0.0', 9999, conn)
+        # 启动 TCP 服务器
+        start_tcp_server('0.0.0.0', port, conn)
     else:
         print("Error! 无法创建数据库连接。")
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) < 2:
+        print("Usage: python main.py <config_path>")
+        sys.exit(1)
+    
+    config_path = sys.argv[1]
+    main(config_path)

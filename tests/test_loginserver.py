@@ -63,7 +63,7 @@ def test_query_supernode(host, port):
 
 # 测试用例
 server_host = 'localhost'
-server_port = 9999
+server_port = 9000
 
 test_register_user(server_host, server_port, 'testuser', 'testpass')
 test_login(server_host, server_port, 'testuser', 'testpass')

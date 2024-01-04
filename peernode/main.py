@@ -1,11 +1,34 @@
 import socket
+import sys
 import threading
 import sqlite3
 import hashlib
 import struct
 import json
+import time
+import logging
+import functools
+
+# 配置日志
+logging.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+def log_decorator(func):
+    """日志装饰器"""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            logging.info(f"Function {func.__name__} started with args: {args} and kwargs: {kwargs}")
+            result = func(*args, **kwargs)
+            logging.info(f"Function {func.__name__} ended successfully")
+            return result
+        except Exception as e:
+            logging.exception(f"Function {func.__name__} raised an exception: {e}")
+            # 可以选择在这里重新抛出异常，或者返回某种错误表示
+            raise 
+    return wrapper
 
 # database
+@log_decorator
 def create_connection(db_file):
     """ 创建一个数据库连接到SQLite数据库 """
     conn = None
@@ -16,6 +39,7 @@ def create_connection(db_file):
         print(e)
     return conn
 
+@log_decorator
 def create_tables(conn):
     """ 创建超级节点、对等节点和在线对等节点表 """
     sql_create_friends_table = """
@@ -56,6 +80,7 @@ def create_tables(conn):
     except sqlite3.Error as e:
         print(e)
         
+@log_decorator
 def add_friend(conn, username, ip, port):
     """ 添加好友 """
     sql = ''' INSERT INTO friends(username, ip, port) VALUES(?,?,?) '''
@@ -63,6 +88,7 @@ def add_friend(conn, username, ip, port):
     cur.execute(sql, (username, ip, port))
     conn.commit()
 
+@log_decorator
 def delete_friend(conn, username):
     """ 删除好友 """
     sql = ''' DELETE FROM friends WHERE username = ? '''
@@ -70,6 +96,16 @@ def delete_friend(conn, username):
     cur.execute(sql, (username,))
     conn.commit()
 
+def get_friends_list(conn):
+    """ 获取指定用户的好友列表 """
+    sql = ''' SELECT * FROM friends'''
+    cur = conn.cursor()
+    cur.execute(sql, ())
+    friends = cur.fetchall()
+    return friends
+
+
+@log_decorator
 def add_chat_message(conn, sender, receiver, content, timestamp):
     """ 添加聊天记录 """
     sql = ''' INSERT INTO chat_history(sender_username, receiver_username, content, timestamp) 
@@ -78,6 +114,7 @@ def add_chat_message(conn, sender, receiver, content, timestamp):
     cur.execute(sql, (sender, receiver, content, timestamp))
     conn.commit()
 
+@log_decorator
 def add_supernode(conn, ip, port):
     """ 添加超级节点 """
     sql = ''' INSERT INTO supernodes(ip, port) VALUES(?,?) ON CONFLICT(ip) DO NOTHING '''
@@ -85,6 +122,7 @@ def add_supernode(conn, ip, port):
     cur.execute(sql, (ip, port))
     conn.commit()
 
+@log_decorator
 def remove_supernode(conn, ip):
     """ 移除超级节点 """
     sql = ''' DELETE FROM supernodes WHERE ip = ? '''
@@ -92,6 +130,7 @@ def remove_supernode(conn, ip):
     cur.execute(sql, (ip,))
     conn.commit()
 
+@log_decorator
 def add_peernode(conn, ip, port):
     """ 添加对等节点 """
     sql = ''' INSERT INTO peernodes(ip, port) VALUES(?,?) ON CONFLICT(ip) DO NOTHING '''
@@ -99,6 +138,7 @@ def add_peernode(conn, ip, port):
     cur.execute(sql, (ip, port))
     conn.commit()
 
+@log_decorator
 def remove_peernode(conn, ip):
     """ 移除对等节点 """
     sql = ''' DELETE FROM peernodes WHERE ip = ? '''
@@ -121,6 +161,7 @@ def parse_request(data):
         return None, None
     return type_field, data_field
 
+@log_decorator
 def handle_client_connection(client_socket, conn):
     request = client_socket.recv(1024)
     type_field, data_field = parse_request(request)
@@ -215,7 +256,6 @@ def send_request(host, port, request_type, data):
         response_data = response[4:].decode('utf-8')
         return response_type, response_data
 
-
     
 # server connection
 def start_tcp_server(address, port, conn):
@@ -232,18 +272,29 @@ def start_tcp_server(address, port, conn):
             args=(client_sock, conn)
         )
         client_handler.start()
-
+        
 # main
-def main():
-    db_file = 'peernode.db'
-    conn = create_connection(db_file)
+def main(config_path):
+    # 加载配置文件
+    with open(config_path) as f:
+        config = json.load(f)
 
+    db_file = config['database_file']
+    port = config['port']
+
+    # 创建数据库连接
+    conn = create_connection(db_file)
     if conn is not None:
         create_tables(conn)
-        # 启动TCP服务器
-        start_tcp_server('0.0.0.0', 7777, conn)
+        # 启动 TCP 服务器
+        start_tcp_server('0.0.0.0', port, conn)
     else:
         print("Error! 无法创建数据库连接。")
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) < 2:
+        print("Usage: python main.py <config_path>")
+        sys.exit(1)
+    
+    config_path = sys.argv[1]
+    main(config_path)

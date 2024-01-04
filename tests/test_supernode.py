@@ -49,7 +49,7 @@ def test_user_search_message(host, port, username):
 
 # 运行测试
 supernode_host = '127.0.0.1'  # 替换为您的超级节点服务器地址
-supernode_port = 8888         # 替换为您的超级节点服务器端口
+supernode_port = 9001         # 替换为您的超级节点服务器端口
 
 test_login_server_address_request(supernode_host, supernode_port)
 test_keep_alive_message(supernode_host, supernode_port)

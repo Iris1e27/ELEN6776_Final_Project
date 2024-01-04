@@ -46,7 +46,7 @@ def test_send_chat_message(host, port, sender_username, receiver_username, conte
 
 # 运行测试
 peernode_host = '127.0.0.1'  # 替换为您的对等节点服务器地址
-peernode_port = 7777         # 替换为您的对等节点服务器端口
+peernode_port = 8002         # 替换为您的对等节点服务器端口
 
 test_add_delete_buddy(peernode_host, peernode_port, 'buddyuser', 'add')
 test_add_delete_buddy(peernode_host, peernode_port, 'buddyuser', 'delete')

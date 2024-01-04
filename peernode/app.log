@@ -1,0 +1,16 @@
+2024-01-04 11:58:31,193 - root - INFO - Function create_connection started with args: ('peernode2.db',) and kwargs: {}
+2024-01-04 11:58:31,194 - root - INFO - Function create_connection ended successfully
+2024-01-04 11:58:31,194 - root - INFO - Function create_tables started with args: (<sqlite3.Connection object at 0x000001E731223E40>,) and kwargs: {}
+2024-01-04 11:58:31,218 - root - INFO - Function create_tables ended successfully
+2024-01-04 11:58:37,180 - root - INFO - Function handle_client_connection started with args: (<socket.socket fd=536, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8002), raddr=('127.0.0.1', 11327)>, <sqlite3.Connection object at 0x000001E731223E40>) and kwargs: {}
+2024-01-04 11:58:37,180 - root - INFO - Function add_friend started with args: (<sqlite3.Connection object at 0x000001E731223E40>, 'buddyuser', '', 0) and kwargs: {}
+2024-01-04 11:58:37,187 - root - INFO - Function add_friend ended successfully
+2024-01-04 11:58:37,187 - root - INFO - Function handle_client_connection ended successfully
+2024-01-04 11:58:37,190 - root - INFO - Function handle_client_connection started with args: (<socket.socket fd=552, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8002), raddr=('127.0.0.1', 11328)>, <sqlite3.Connection object at 0x000001E731223E40>) and kwargs: {}
+2024-01-04 11:58:37,190 - root - INFO - Function delete_friend started with args: (<sqlite3.Connection object at 0x000001E731223E40>, 'buddyuser') and kwargs: {}
+2024-01-04 11:58:37,196 - root - INFO - Function delete_friend ended successfully
+2024-01-04 11:58:37,197 - root - INFO - Function handle_client_connection ended successfully
+2024-01-04 11:58:37,198 - root - INFO - Function handle_client_connection started with args: (<socket.socket fd=556, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8002), raddr=('127.0.0.1', 11329)>, <sqlite3.Connection object at 0x000001E731223E40>) and kwargs: {}
+2024-01-04 11:58:37,199 - root - INFO - Function add_chat_message started with args: (<sqlite3.Connection object at 0x000001E731223E40>, 'senderuser', 'receiveruser', 'Hello, this is a test message', '2024-01-04T16:58:37Z') and kwargs: {}
+2024-01-04 11:58:37,207 - root - INFO - Function add_chat_message ended successfully
+2024-01-04 11:58:37,207 - root - INFO - Function handle_client_connection ended successfully

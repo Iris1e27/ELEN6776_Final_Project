@@ -1,0 +1,5 @@
+{
+    "database_file": "peernode2.db",
+    "port": 8002,
+    "username": "peernode2"
+}
