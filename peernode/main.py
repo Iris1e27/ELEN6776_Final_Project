@@ -272,6 +272,106 @@ def start_tcp_server(address, port, conn):
             args=(client_sock, conn)
         )
         client_handler.start()
+
+# cli
+def cli_interface(host, port, conn):
+    loginserver_host = '127.0.0.1'
+    loginserver_port = 8000
+    supernode_host = '127.0.0.1'
+    supernode_port = 8001
+    while True:
+        print("\Welcome to our chat app:")
+        print("1. Register")
+        print("2. Login")
+        print("3. Exit")
+        choice = input("Enter option: ")
+        
+        if choice == '1':
+            # 注册
+            print("Now register here: ")
+            register_username = input("Enter username: ")
+            register_password = input("Enter password: ")
+            data = {
+                'username': register_username,
+                'password': register_password,
+                'operation': 'register',
+                'timestamp': time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+            }
+            response_type, response_data = send_request(loginserver_host, loginserver_port, 3, data)
+            print('Register User Response:', response_type, response_data)
+            if response_data["message_code"] == 200:
+                print("You register successfully.")
+            else:
+                print("You register failed.")
+        elif choice == '2':
+            # 登录
+            print("Now login here: ")
+            login_username = input("Enter username: ")
+            login_password = input("Enter password: ")
+            data = {
+                'username': login_username,
+                'password': login_password,
+                'IP': host,
+                'Port': port,
+                'operation': 'login',
+                'timestamp': time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+            }
+            response_type, response_data = send_request(loginserver_host, loginserver_port, 4, data)
+            print('Login Response:', response_type, response_data)
+            if response_data["message_code"] == 200:
+                print("You login successfully.")
+                
+                while True:
+                    print("\nMenu:")
+                    print("1. Get Buddy List")
+                    print("2. Add/Delete Friend")
+                    print("3. Send Message")
+                    print("4. Log Out")
+                    option = input("Enter option: ")
+                    if option == '1':
+                        # 获取好友列表
+                        print("Your friends list: ")
+                        friends = get_friends_list(conn)
+                        print(friends)
+                    elif option == '2':
+                        # 添加或删除好友
+                        print("Now you add/delete friend: ")
+                        friend_username = input("Enter friend's username: ")
+                        operation = input("Enter operation(add/delete): ")
+                        data = {
+                            'username': friend_username,
+                            'operation': operation,
+                            'timestamp': time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+                        }
+                        # response_type, response_data = send_request(friend_host, friend_port, 8, data)
+                        # print(f'Add/Delete Buddy Response (Type {response_type}):', response_data)
+                    elif option == '3':
+                        # 发送消息
+                        print("Now you add/delete friend: ")
+                        friend_username = input("Enter friend's username: ")
+                        content = input("Enter content: ")
+                        data = {
+                            'sender_username': login_username,
+                            'receiver_username': friend_username,
+                            'content': content,
+                            'timestamp': time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+                        }
+                        # response_type, response_data = send_request(friend_host, friend_port, 9, data)
+                        # print(f'Send Chat Message Response (Type {response_type}):', response_data)
+                    elif option == '4':
+                        print("Log out.")
+                    else:
+                        print("Invalid option, please try again.")
+            else:
+                print("You login failed.")
+        elif choice == '3':
+            # 退出客户端
+            print("Exiting.")
+            sys.exit(0)  # 退出并返回成功状态码
+            break
+        else:
+            print("Invalid option, please try again.")
+    
         
 # main
 def main(config_path):
@@ -286,6 +386,10 @@ def main(config_path):
     conn = create_connection(db_file)
     if conn is not None:
         create_tables(conn)
+        # 启动CLI界面并设置为后台线程
+        cli_thread = threading.Thread(target=cli_interface, args=("0.0.0.0", port, conn))
+        cli_thread.daemon = True  # 设置为后台线程
+        cli_thread.start()
         # 启动 TCP 服务器
         start_tcp_server('0.0.0.0', port, conn)
     else:

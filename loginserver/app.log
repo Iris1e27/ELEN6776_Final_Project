@@ -1,34 +1,4 @@
-2024-01-04 15:08:57,639 - root - INFO - Function create_connection started with args: ('loginserver.db',) and kwargs: {}
-2024-01-04 15:08:57,640 - root - INFO - Function create_connection ended successfully
-2024-01-04 15:08:57,640 - root - INFO - Function create_tables started with args: (<sqlite3.Connection object at 0x0000021E6C203D40>,) and kwargs: {}
-2024-01-04 15:08:57,640 - root - INFO - Function create_tables ended successfully
-2024-01-04 15:09:02,890 - root - INFO - Function handle_client_connection started with args: (<socket.socket fd=484, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 9000), raddr=('127.0.0.1', 6198)>, <sqlite3.Connection object at 0x0000021E6C203D40>) and kwargs: {}
-2024-01-04 15:09:02,892 - root - INFO - Function register_user started with args: (<sqlite3.Connection object at 0x0000021E6C203D40>, 'testuser', '13d249f2cb4127b40cfa757866850278793f814ded3c587fe5889e889a7a9f6c') and kwargs: {}
-2024-01-04 15:09:02,893 - root - INFO - Function register_user ended successfully
-2024-01-04 15:09:02,893 - root - INFO - Function handle_client_connection ended successfully
-2024-01-04 15:09:02,895 - root - INFO - Function handle_client_connection started with args: (<socket.socket fd=504, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 9000), raddr=('127.0.0.1', 6199)>, <sqlite3.Connection object at 0x0000021E6C203D40>) and kwargs: {}
-2024-01-04 15:09:02,895 - root - INFO - Function authenticate_user started with args: (<sqlite3.Connection object at 0x0000021E6C203D40>, 'testuser', '13d249f2cb4127b40cfa757866850278793f814ded3c587fe5889e889a7a9f6c') and kwargs: {}
-2024-01-04 15:09:02,895 - root - INFO - Function authenticate_user ended successfully
-2024-01-04 15:09:02,895 - root - INFO - Function handle_client_connection ended successfully
-2024-01-04 15:09:02,896 - root - INFO - Function handle_client_connection started with args: (<socket.socket fd=520, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 9000), raddr=('127.0.0.1', 6200)>, <sqlite3.Connection object at 0x0000021E6C203D40>) and kwargs: {}
-2024-01-04 15:09:02,896 - root - INFO - Function add_supernode started with args: (<sqlite3.Connection object at 0x0000021E6C203D40>, '127.0.0.1', 6200) and kwargs: {}
-2024-01-04 15:09:02,897 - root - ERROR - Function add_supernode raised an exception: UNIQUE constraint failed: supernodes.ip
-Traceback (most recent call last):
-  File "E:\ColumbiaUniversity\ELEN6776\chatapp\loginserver\main.py", line 20, in wrapper
-    result = func(*args, **kwargs)
-  File "E:\ColumbiaUniversity\ELEN6776\chatapp\loginserver\main.py", line 102, in add_supernode
-    cur.execute(sql, (ip, port))
-sqlite3.IntegrityError: UNIQUE constraint failed: supernodes.ip
-2024-01-04 15:09:02,898 - root - ERROR - Function handle_client_connection raised an exception: UNIQUE constraint failed: supernodes.ip
-Traceback (most recent call last):
-  File "E:\ColumbiaUniversity\ELEN6776\chatapp\loginserver\main.py", line 20, in wrapper
-    result = func(*args, **kwargs)
-  File "E:\ColumbiaUniversity\ELEN6776\chatapp\loginserver\main.py", line 146, in handle_client_connection
-    response = handle_register_delete_SN_message(conn, data_field, client_address)
-  File "E:\ColumbiaUniversity\ELEN6776\chatapp\loginserver\main.py", line 179, in handle_register_delete_SN_message
-    add_supernode(conn, client_ip, client_port)
-  File "E:\ColumbiaUniversity\ELEN6776\chatapp\loginserver\main.py", line 20, in wrapper
-    result = func(*args, **kwargs)
-  File "E:\ColumbiaUniversity\ELEN6776\chatapp\loginserver\main.py", line 102, in add_supernode
-    cur.execute(sql, (ip, port))
-sqlite3.IntegrityError: UNIQUE constraint failed: supernodes.ip
+2024-01-06 12:18:44,409 - root - INFO - Function create_connection started with args: ('loginserver.db',) and kwargs: {}
+2024-01-06 12:18:44,410 - root - INFO - Function create_connection ended successfully
+2024-01-06 12:18:44,410 - root - INFO - Function create_tables started with args: (<sqlite3.Connection object at 0x000001450FE63D40>,) and kwargs: {}
+2024-01-06 12:18:44,411 - root - INFO - Function create_tables ended successfully
